@@ -1,0 +1,662 @@
+<div class="alert alert-info mt-4">
+  <i class="fas fa-info-circle"></i>
+  <strong>Important:</strong> This AI-powered tool is for educational and research purposes only. 
+  Always consult with qualified healthcare professionals for proper medical diagnosis and treatment decisions.
+</div>
+</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Breast Cancer Detection System</title>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+<style>
+body {
+margin: 0;
+padding: 20px;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+min-height: 100vh;
+font-family: 'Arial', sans-serif;
+}
+
+.main-container {
+max-width: 1400px;
+margin: 0 auto;
+}
+
+.header {
+background: rgba(255, 255, 255, 0.95);
+backdrop-filter: blur(10px);
+border-radius: 15px;
+padding: 30px;
+margin-bottom: 30px;
+box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+text-align: center;
+}
+
+.header h1 {
+color: #2c3e50;
+font-weight: bold;
+margin-bottom: 10px;
+font-size: 2.5rem;
+}
+
+.header p {
+color: #7f8c8d;
+font-size: 1.1rem;
+margin: 0;
+}
+
+.input-section {
+background: rgba(255, 255, 255, 0.95);
+backdrop-filter: blur(10px);
+border-radius: 15px;
+padding: 30px;
+margin-bottom: 30px;
+box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.results-section {
+background: rgba(255, 255, 255, 0.95);
+backdrop-filter: blur(10px);
+border-radius: 15px;
+padding: 30px;
+margin-bottom: 30px;
+box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+display: none;
+}
+
+.results-section.show {
+display: block;
+animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+from {
+  opacity: 0;
+  transform: translateY(30px);
+}
+to {
+  opacity: 1;
+  transform: translateY(0);
+}
+}
+
+.form-section {
+margin-bottom: 25px;
+padding: 20px;
+background: #f8f9fa;
+border-radius: 10px;
+border-left: 4px solid #667eea;
+}
+
+.form-section h4 {
+color: #2c3e50;
+margin-bottom: 15px;
+font-weight: bold;
+}
+
+.form-group {
+margin-bottom: 15px;
+}
+
+.form-group label {
+font-weight: 600;
+color: #34495e;
+margin-bottom: 5px;
+display: block;
+}
+
+.form-control {
+border-radius: 8px;
+border: 2px solid #e9ecef;
+padding: 10px;
+transition: all 0.3s ease;
+}
+
+.form-control:focus {
+border-color: #667eea;
+box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.btn-predict {
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+border: none;
+padding: 15px 30px;
+font-size: 1.1rem;
+font-weight: bold;
+border-radius: 50px;
+transition: all 0.3s ease;
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-predict:hover {
+transform: translateY(-2px);
+box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.prediction-card {
+text-align: center;
+padding: 25px;
+border-radius: 15px;
+margin-bottom: 30px;
+}
+
+.prediction-card.success {
+background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+color: white;
+}
+
+.prediction-card.danger {
+background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+color: white;
+}
+
+.prediction-card h2 {
+font-size: 2rem;
+margin-bottom: 10px;
+font-weight: bold;
+}
+
+.confidence-score {
+font-size: 1.2rem;
+margin-top: 10px;
+}
+
+.chart-container {
+background: white;
+border-radius: 15px;
+padding: 20px;
+margin-bottom: 20px;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container h5 {
+color: #2c3e50;
+margin-bottom: 15px;
+font-weight: bold;
+}
+
+.insights-container {
+background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+border-radius: 15px;
+padding: 25px;
+margin-top: 20px;
+}
+
+.insights-container h5 {
+color: #2d3436;
+margin-bottom: 15px;
+font-weight: bold;
+}
+
+.insight-item {
+background: rgba(255, 255, 255, 0.8);
+padding: 12px;
+border-radius: 8px;
+margin-bottom: 10px;
+border-left: 4px solid #fd79a8;
+}
+
+.feature-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+gap: 15px;
+margin-bottom: 20px;
+}
+
+.toggle-section {
+margin: 20px 0;
+}
+
+.toggle-btn {
+background: #6c757d;
+color: white;
+border: none;
+padding: 10px 20px;
+border-radius: 25px;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+background: #5a6268;
+}
+
+.toggle-btn.active {
+background: #667eea;
+}
+
+.hidden {
+display: none;
+}
+
+.error-alert {
+background: #ff6b6b;
+color: white;
+padding: 15px;
+border-radius: 10px;
+margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+.feature-grid {
+  grid-template-columns: 1fr;
+}
+
+.header h1 {
+  font-size: 2rem;
+}
+}
+</style>
+</head>
+
+<body>
+<div class="main-container">
+<!-- Header -->
+<div class="header">
+<h1><i class="fas fa-user-md"></i> Advanced Breast Cancer Detection System</h1>
+<p>AI-Powered Medical Diagnostic Tool with Comprehensive Analysis</p>
+</div>
+
+<!-- Error Display -->
+{% if error %}
+<div class="error-alert">
+<i class="fas fa-exclamation-triangle"></i> {{ error }}
+</div>
+{% endif %}
+
+<!-- Input Section -->
+<div class="input-section">
+<h3 class="text-center mb-4"><i class="fas fa-clipboard-list"></i> Patient Data Input</h3>
+
+<div class="toggle-section text-center">
+  <button type="button" class="toggle-btn active" onclick="showOriginalForm()">
+      <i class="fas fa-file-medical"></i> Original Wisconsin Dataset
+  </button>
+  <button type="button" class="toggle-btn" onclick="showComprehensiveForm()">
+      <i class="fas fa-chart-line"></i> Comprehensive Analysis
+  </button>
+</div>
+
+<!-- Original Form -->
+<form id="originalForm" action="/predict" method="post">
+  <div class="form-section">
+      <h4><i class="fas fa-microscope"></i> Wisconsin Breast Cancer Dataset Features</h4>
+      <div class="feature-grid">
+          <div class="form-group">
+              <label for="clump_thickness">Clump Thickness (1-10)</label>
+              <input type="number" class="form-control" name="clump_thickness" 
+                     min="1" max="10" step="1" required>
+          </div>
+          <div class="form-group">
+              <label for="uniform_cell_size">Uniform Cell Size (1-10)</label>
+              <input type="number" class="form-control" name="uniform_cell_size" 
+                     min="1" max="10" step="1" required>
+          </div>
+          <div class="form-group">
+              <label for="uniform_cell_shape">Uniform Cell Shape (1-10)</label>
+              <input type="number" class="form-control" name="uniform_cell_shape" 
+                     min="1" max="10" step="1" required>
+          </div>
+          <div class="form-group">
+              <label for="marginal_adhesion">Marginal Adhesion (1-10)</label>
+              <input type="number" class="form-control" name="marginal_adhesion" 
+                     min="1" max="10" step="1" required>
+          </div>
+          <div class="form-group">
+              <label for="single_epithelial_size">Single Epithelial Cell Size (1-10)</label>
+              <input type="number" class="form-control" name="single_epithelial_size" 
+                     min="1" max="10" step="1" required>
+          </div>
+          <div class="form-group">
+              <label for="bare_nuclei">Bare Nuclei (1-10)</label>
+              <input type="number" class="form-control" name="bare_nuclei" 
+                     min="1" max="10" step="1" required>
+          </div>
+          <div class="form-group">
+              <label for="bland_chromatin">Bland Chromatin (1-10)</label>
+              <input type="number" class="form-control" name="bland_chromatin" 
+                     min="1" max="10" step="1" required>
+          </div>
+          <div class="form-group">
+              <label for="normal_nucleoli">Normal Nucleoli (1-10)</label>
+              <input type="number" class="form-control" name="normal_nucleoli" 
+                     min="1" max="10" step="1" required>
+          </div>
+          <div class="form-group">
+              <label for="mitoses">Mitoses (1-10)</label>
+              <input type="number" class="form-control" name="mitoses" 
+                     min="1" max="10" step="1" required>
+          </div>
+      </div>
+  </div>
+  <div class="text-center">
+      <button type="submit" class="btn btn-predict btn-lg">
+          <i class="fas fa-brain"></i> Analyze & Predict
+      </button>
+  </div>
+</form>
+
+<!-- Comprehensive Form -->
+<form id="comprehensiveForm" action="/predict" method="post" class="hidden">
+  <div class="form-section">
+      <h4><i class="fas fa-chart-area"></i> Mean Values</h4>
+      <div class="feature-grid">
+          <div class="form-group">
+              <label for="radius_mean">Radius Mean</label>
+              <input type="number" class="form-control" name="radius_mean" step="0.01">
+          </div>
+          <div class="form-group">
+              <label for="texture_mean">Texture Mean</label>
+              <input type="number" class="form-control" name="texture_mean" step="0.01">
+          </div>
+          <div class="form-group">
+              <label for="perimeter_mean">Perimeter Mean</label>
+              <input type="number" class="form-control" name="perimeter_mean" step="0.01">
+          </div>
+          <div class="form-group">
+              <label for="area_mean">Area Mean</label>
+              <input type="number" class="form-control" name="area_mean" step="0.01">
+          </div>
+          <div class="form-group">
+              <label for="smoothness_mean">Smoothness Mean</label>
+              <input type="number" class="form-control" name="smoothness_mean" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="compactness_mean">Compactness Mean</label>
+              <input type="number" class="form-control" name="compactness_mean" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="concavity_mean">Concavity Mean</label>
+              <input type="number" class="form-control" name="concavity_mean" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="concave_points_mean">Concave Points Mean</label>
+              <input type="number" class="form-control" name="concave_points_mean" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="symmetry_mean">Symmetry Mean</label>
+              <input type="number" class="form-control" name="symmetry_mean" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="fractal_dimension_mean">Fractal Dimension Mean</label>
+              <input type="number" class="form-control" name="fractal_dimension_mean" step="0.001">
+          </div>
+      </div>
+  </div>
+
+  <div class="form-section">
+      <h4><i class="fas fa-chart-bar"></i> Standard Error Values</h4>
+      <div class="feature-grid">
+          <div class="form-group">
+              <label for="radius_se">Radius SE</label>
+              <input type="number" class="form-control" name="radius_se" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="texture_se">Texture SE</label>
+              <input type="number" class="form-control" name="texture_se" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="perimeter_se">Perimeter SE</label>
+              <input type="number" class="form-control" name="perimeter_se" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="area_se">Area SE</label>
+              <input type="number" class="form-control" name="area_se" step="0.01">
+          </div>
+          <div class="form-group">
+              <label for="smoothness_se">Smoothness SE</label>
+              <input type="number" class="form-control" name="smoothness_se" step="0.0001">
+          </div>
+          <div class="form-group">
+              <label for="compactness_se">Compactness SE</label>
+              <input type="number" class="form-control" name="compactness_se" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="concavity_se">Concavity SE</label>
+              <input type="number" class="form-control" name="concavity_se" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="concave_points_se">Concave Points SE</label>
+              <input type="number" class="form-control" name="concave_points_se" step="0.0001">
+          </div>
+          <div class="form-group">
+              <label for="symmetry_se">Symmetry SE</label>
+              <input type="number" class="form-control" name="symmetry_se" step="0.0001">
+          </div>
+          <div class="form-group">
+              <label for="fractal_dimension_se">Fractal Dimension SE</label>
+              <input type="number" class="form-control" name="fractal_dimension_se" step="0.0001">
+          </div>
+      </div>
+  </div>
+
+  <div class="form-section">
+      <h4><i class="fas fa-chart-line"></i> Worst Values</h4>
+      <div class="feature-grid">
+          <div class="form-group">
+              <label for="radius_worst">Radius Worst</label>
+              <input type="number" class="form-control" name="radius_worst" step="0.01">
+          </div>
+          <div class="form-group">
+              <label for="texture_worst">Texture Worst</label>
+              <input type="number" class="form-control" name="texture_worst" step="0.01">
+          </div>
+          <div class="form-group">
+              <label for="perimeter_worst">Perimeter Worst</label>
+              <input type="number" class="form-control" name="perimeter_worst" step="0.01">
+          </div>
+          <div class="form-group">
+              <label for="area_worst">Area Worst</label>
+              <input type="number" class="form-control" name="area_worst" step="0.01">
+          </div>
+          <div class="form-group">
+              <label for="smoothness_worst">Smoothness Worst</label>
+              <input type="number" class="form-control" name="smoothness_worst" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="compactness_worst">Compactness Worst</label>
+              <input type="number" class="form-control" name="compactness_worst" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="concavity_worst">Concavity Worst</label>
+              <input type="number" class="form-control" name="concavity_worst" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="concave_points_worst">Concave Points Worst</label>
+              <input type="number" class="form-control" name="concave_points_worst" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="symmetry_worst">Symmetry Worst</label>
+              <input type="number" class="form-control" name="symmetry_worst" step="0.001">
+          </div>
+          <div class="form-group">
+              <label for="fractal_dimension_worst">Fractal Dimension Worst</label>
+              <input type="number" class="form-control" name="fractal_dimension_worst" step="0.0001">
+          </div>
+      </div>
+  </div>
+
+  <div class="text-center">
+      <button type="submit" class="btn btn-predict btn-lg">
+          <i class="fas fa-brain"></i> Advanced Analysis & Predict
+      </button>
+  </div>
+</form>
+</div>
+
+<!-- Results Section -->
+{% if show_results %}
+<div class="results-section show">
+<!-- Prediction Result -->
+<div class="prediction-card {{ color_class }}">
+  <h2><i class="fas fa-stethoscope"></i> {{ prediction_text }}</h2>
+  <p class="lead">Risk Level: {{ risk_level }}</p>
+  <div class="confidence-score">
+      <i class="fas fa-percentage"></i> Confidence: {{ confidence }}%
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row">
+  <div class="col-md-6">
+      <div class="chart-container">
+          <h5><i class="fas fa-radar-chart"></i> Feature Analysis Radar</h5>
+          {% if radar_chart %}
+          <img src="data:image/png;base64,{{ radar_chart }}" class="img-fluid" alt="Radar Chart">
+          {% endif %}
+      </div>
+  </div>
+  <div class="col-md-6">
+      <div class="chart-container">
+          <h5><i class="fas fa-chart-bar"></i> Feature Values Distribution</h5>
+          {% if bar_chart %}
+          <img src="data:image/png;base64,{{ bar_chart }}" class="img-fluid" alt="Bar Chart">
+          {% endif %}
+      </div>
+  </div>
+</div>
+
+<!-- <div class="row">
+  <div class="col-md-12">
+      <div class="chart-container">
+          <h5><i class="fas fa-pie-chart"></i> Risk Assessment</h5>
+          {% if risk_chart %}
+          <img src="data:image/png;base64,{{ risk_chart }}" class="img-fluid" alt="Risk Chart">
+          {% endif %}
+      </div>
+  </div>
+</div> -->
+
+<!-- Medical Insights -->
+{% if insights %}
+<div class="insights-container">
+  <h5><i class="fas fa-lightbulb"></i> Medical Insights & Recommendations</h5>
+  {% for insight in insights %}
+  <div class="insight-item">
+      <i class="fas fa-check-circle"></i> {{ insight }}
+  </div>
+  {% endfor %}
+  
+  <div class="alert alert-info mt-3">
+      <i class="fas fa-info-circle"></i>
+      <strong>Important:</strong> This tool is for educational purposes only. 
+      Always consult with qualified healthcare professionals for proper medical diagnosis and treatment.
+  </div>
+</div>
+{% endif %}
+</div>
+{% endif %}
+
+<!-- Information Section -->
+<div class="input-section">
+<h4><i class="fas fa-info-circle"></i> About This System</h4>
+<div class="row">
+  <div class="col-md-4">
+      <div class="text-center p-3">
+          <i class="fas fa-robot fa-3x text-primary mb-3"></i>
+          <h5>AI-Powered</h5>
+          <p>Uses Support Vector Machine (SVM) algorithm for accurate predictions</p>
+      </div>
+  </div>
+  <div class="col-md-4">
+      <div class="text-center p-3">
+          <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+          <h5>Comprehensive Analysis</h5>
+          <p>Analyzes multiple cellular characteristics with detailed visualizations</p>
+      </div>
+  </div>
+  <div class="col-md-4">
+      <div class="text-center p-3">
+          <i class="fas fa-shield-alt fa-3x text-warning mb-3"></i>
+          <h5>Medical Support</h5>
+          <p>Provides insights to support medical decision-making</p>
+      </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- JavaScript -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+function showOriginalForm() {
+document.getElementById('originalForm').classList.remove('hidden');
+document.getElementById('comprehensiveForm').classList.add('hidden');
+
+// Update toggle buttons
+document.querySelector('.toggle-btn:nth-child(1)').classList.add('active');
+document.querySelector('.toggle-btn:nth-child(2)').classList.remove('active');
+}
+
+function showComprehensiveForm() {
+document.getElementById('originalForm').classList.add('hidden');
+document.getElementById('comprehensiveForm').classList.remove('hidden');
+
+// Update toggle buttons
+document.querySelector('.toggle-btn:nth-child(1)').classList.remove('active');
+document.querySelector('.toggle-btn:nth-child(2)').classList.add('active');
+}
+
+// Fill sample data for testing
+function fillSampleData() {
+if (!document.getElementById('originalForm').classList.contains('hidden')) {
+  // Sample data for original form
+  document.querySelector('input[name="clump_thickness"]').value = '5';
+  document.querySelector('input[name="uniform_cell_size"]').value = '3';
+  document.querySelector('input[name="uniform_cell_shape"]').value = '3';
+  document.querySelector('input[name="marginal_adhesion"]').value = '2';
+  document.querySelector('input[name="single_epithelial_size"]').value = '2';
+  document.querySelector('input[name="bare_nuclei"]').value = '3';
+  document.querySelector('input[name="bland_chromatin"]').value = '3';
+  document.querySelector('input[name="normal_nucleoli"]').value = '1';
+  document.querySelector('input[name="mitoses"]').value = '1';
+}
+}
+
+// Add sample data button
+$(document).ready(function() {
+$('.btn-predict').before(`
+  <button type="button" class="btn btn-outline-secondary mr-2" onclick="fillSampleData()">
+      <i class="fas fa-flask"></i> Fill Sample Data
+  </button>
+`);
+
+// Smooth scrolling to results
+{% if show_results %}
+$('html, body').animate({
+  scrollTop: $('.results-section').offset().top - 20
+}, 1000);
+{% endif %}
+});
+
+// Form validation
+$('form').on('submit', function(e) {
+let hasValues = false;
+$(this).find('input[type="number"]').each(function() {
+  if ($(this).val() !== '') {
+      hasValues = true;
+      return false;
+  }
+});
+
+if (!hasValues) {
+  e.preventDefault();
+  alert('Please enter at least one feature value.');
+  return false;
+}
+});
+</script>
+</body>
+</html>
